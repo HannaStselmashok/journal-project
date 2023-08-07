@@ -1,2 +1,41 @@
-ABOUT
-Ballife - is an online lifestile journal. There are several categories of history, sport, food, etc. Each registered user can post and comment on articles. 
+USE journal_project;
+
+SELECT category_name, ROUND(AVG(age), 0) AS average_age
+FROM users INNER JOIN article USING(user_id)
+	INNER JOIN category USING(category_id)
+GROUP BY category_name
+ORDER BY 2 DESC;
+
+SELECT a.title, a.publicatiob_date, COUNT(c.article_id) AS comments
+FROM users u
+	INNER JOIN article a USING(user_id)
+    INNER JOIN comment c USING(article_id)
+GROUP BY a.title, a.publicatiob_date
+HAVING COUNT(c.article_id) = 
+	(SELECT MAX(number)
+    FROM
+		(SELECT article.article_id, COUNT(comment.article_id) AS number
+        FROM article INNER JOIN comment USING(article_id)
+        GROUP BY article.article_id
+      ) c_count 
+	);
+    
+SELECT ROUND(AVG(age),0) AS age
+FROM users u INNER JOIN article a USING(user_id)
+WHERE a.title LIKE '%SQL%';
+
+SELECT surname, MONTH(publicatiob_date) AS month, COUNT(a.user_id) as amount
+FROM users u INNER JOIN article a USING(user_id)
+GROUP BY 1, 2
+ORDER BY 1, 2 DESC;
+
+SELECT surname, COUNT(a.user_id) AS amount
+FROM users u INNER JOIN article a USING(user_id)
+GROUP BY 1
+HAVING COUNT(a.user_id) = 
+	(SELECT MAX(number)
+    FROM
+		(SELECT u.user_id, COUNT(a.user_id) AS number
+        FROM users u INNER JOIN article a USING(user_id)
+        GROUP BY 1) q
+	);
